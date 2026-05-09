@@ -1,0 +1,25 @@
+#######################################
+# Syntax Coloring Map For RFDO
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+RFDO		KEYWORD1
+HeldStatus	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+stopLisNstartWri	KEYWORD2
+init        		KEYWORD2
+sendT	            KEYWORD2
+sendTToAll  		KEYWORD2
+startReading        KEYWORD2
+getMyData           KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
