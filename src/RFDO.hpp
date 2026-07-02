@@ -4,20 +4,20 @@ RFDO<GS>::RFDO(
     rf24_gpio_pin_t _cspin,
     const uint64_t* addresses,
     uint8_t numAddresses,
-    GS* data
+    GS& data
 ) :
     RF24(_cepin, _cspin),
     addresses(addresses),
     numberAddresses(numAddresses),
-    myData(data),
+    myData(&data),
     typenameTSize(sizeof(GS))
 {
 //
 }
 
 template <typename GS>
-void RFDO<GS>::init(uint8_t* myAP, rf24_pa_dbm_e pow){
-    this->myAddrPos = myAP;
+void RFDO<GS>::init(uint8_t& myAP, rf24_pa_dbm_e pow){
+    this->myAddrPos = &myAP;
     this->RF24::begin();
 
     this->RF24::setPALevel(pow);
@@ -34,9 +34,9 @@ void RFDO<GS>::stopLisNstartWri(uint8_t mod){
 }
 
 template <typename GS>
-bool RFDO<GS>::sendT(GS* d, uint8_t mod){
+bool RFDO<GS>::sendT(GS& d, uint8_t mod){
     this->stopLisNstartWri(mod);
-    bool sent = this->RF24::write(d, this->typenameTSize);
+    bool sent = this->RF24::write(&d, this->typenameTSize);
 
     this->startReading();
 

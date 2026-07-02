@@ -25,7 +25,7 @@
 
 #include <vector>
 
-#define RFDO_VERSION 1 // v0.0.1
+#define RFDO_VERSION 2 // v0.0.2
 
 template <typename GS>
 class RFDO: public RF24{
@@ -41,13 +41,13 @@ class RFDO: public RF24{
         void stopLisNstartWri(uint8_t mod);
 
     public:
-        RFDO(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, const uint64_t* addresses, uint8_t numAddresses, GS* data);
-        void init(uint8_t* myAP, rf24_pa_dbm_e pow = RF24_PA_LOW);
+        RFDO(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, const uint64_t* addresses, uint8_t numAddresses, GS& data);
+        void init(uint8_t& myAP, rf24_pa_dbm_e pow = RF24_PA_LOW);
 
         /**
          * Sends the GS to the indicate device.
          */
-        bool sendT(GS* d, uint8_t device);
+        bool sendT(GS& d, uint8_t device);
         bool sendT(uint8_t device);
 
         /**
