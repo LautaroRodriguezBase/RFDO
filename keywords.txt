@@ -14,12 +14,13 @@ HeldStatus	KEYWORD1
 #######################################
 
 stopLisNstartWri	KEYWORD2
-init        		KEYWORD2
-sendT	            KEYWORD2
-sendTToAll  		KEYWORD2
-startReading        KEYWORD2
-getMyData           KEYWORD2
+init				KEYWORD2
+sendT				KEYWORD2
+sendTToAll			KEYWORD2
+startReading		KEYWORD2
+getMyData			KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
+RFDO_VERSION	LITERAL1
