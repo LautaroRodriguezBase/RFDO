@@ -2,13 +2,11 @@ template <typename GS>
 RFDO<GS>::RFDO(
     rf24_gpio_pin_t _cepin,
     rf24_gpio_pin_t _cspin,
-    const uint64_t* addresses,
-    uint8_t numAddresses,
+    const uint64_t& seed,
     GS& data
 ) :
     RF24(_cepin, _cspin),
-    addresses(addresses),
-    numberAddresses(numAddresses),
+    seed(seed),
     myData(&data),
     typenameTSize(sizeof(GS))
 {
@@ -17,7 +15,8 @@ RFDO<GS>::RFDO(
 
 template <typename GS>
 void RFDO<GS>::init(uint8_t& myAP, rf24_pa_dbm_e pow){
-    this->myAddrPos = &myAP;
+    // Probar si myAddrPos almacena solo el valor o esta ligado a la direccion
+	this->myAddrPos = myAP;
     this->RF24::begin();
 
     this->RF24::setPALevel(pow);
@@ -27,9 +26,9 @@ void RFDO<GS>::init(uint8_t& myAP, rf24_pa_dbm_e pow){
 }
 
 template <typename GS>
-void RFDO<GS>::stopLisNstartWri(uint8_t mod){
+void RFDO<GS>::stopLisNstartWri(uint8_t devPos){
     this->RF24::stopListening();
-    this->RF24::openWritingPipe(*(this->addresses + mod));
+    this->RF24::openWritingPipe(this->seed * devPos);
     this->RF24::setRetries(millis()%15, 15);
 }
 
@@ -45,12 +44,7 @@ bool RFDO<GS>::sendT(GS& d, uint8_t mod){
 
 template <typename GS>
 bool RFDO<GS>::sendT(uint8_t mod){
-    this->stopLisNstartWri(mod);
-    bool sent = this->RF24::write((this->myData), this->typenameTSize);
-
-    this->startReading();
-
-    return sent;
+    return this->sendT(this->myData, mod);
 }
 
 template <typename GS>
@@ -68,7 +62,7 @@ void RFDO<GS>::sendTToAll(std::vector<uint8_t>* devices, uint8_t secToTry){
 
     while( !devices->empty() && ((millis() - startTime) <= (secToTry * 1000)) ){
 
-        this->RF24::openWritingPipe( *(this->addresses + devices->at(pos)));
+        this->RF24::openWritingPipe( this->seed * devices->at(pos) );
 
         if( this->RF24::write((this->myData), this->typenameTSize) ){
             devices->erase(devices->begin()+pos);
@@ -85,6 +79,6 @@ void RFDO<GS>::sendTToAll(std::vector<uint8_t>* devices, uint8_t secToTry){
 template <typename GS>
 void RFDO<GS>::startReading(){
     // Essentially, this is it: openReadingPipe(1, addresses[myAddrPos]);
-    this->RF24::openReadingPipe(1, *(this->addresses + (*(this->myAddrPos))));
+    this->RF24::openReadingPipe(1, (this->seed * (this->myAddrPos)));
     this->RF24::startListening();
 }

@@ -25,24 +25,34 @@
 
 #include <vector>
 
-#define RFDO_VERSION 2 // v0.0.2
+#define RFDO_VERSION 1000 // v0.1.0
 
 template <typename GS>
 class RFDO: public RF24{
     private:
-        const uint64_t* addresses;
-        /// MAX 255
-        uint8_t numberAddresses;
+        /// Initial addr: this will be used to calculate all others addrs.
+        const uint64_t& seed;
+        /// Object address position
+        uint8_t& myAddrPos;
         GS* myData;
         uint8_t typenameTSize;
-        /// object address position
-        uint8_t* myAddrPos;
 
-        void stopLisNstartWri(uint8_t mod);
+        void stopLisNstartWri(uint8_t devPos);
 
     public:
-        RFDO(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, const uint64_t* addresses, uint8_t numAddresses, GS& data);
-        void init(uint8_t& myAP, rf24_pa_dbm_e pow = RF24_PA_LOW);
+		/**
+		 * @param _cepin it is necessary for the parent class constructor.
+		 * @param _cspin it is necessary for the parent class constructor.
+		 * @param seed ref to initial data used to calculate all the addresses.
+		 * @param data ref to data to be sent
+		 */
+        RFDO(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, const uint64_t& seed, GS& data);
+
+		/**
+		 * @param myAP the address position needed to recive data
+		 * @param pow the signal power used for nRF24
+		 */
+		void init(uint8_t& myAP, rf24_pa_dbm_e pow = RF24_PA_LOW);
 
         /**
          * Sends the GS to the indicate device.
