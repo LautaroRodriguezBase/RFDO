@@ -4,21 +4,13 @@
 #define CE_PIN 10
 #define CSN_PIN 7
 
-// ADDR is a uint64_t variable
-#define ADDR_nRF1  0xFEDCBA9876543210
-#define ADDR_nRF2  0x1
+// SEED is a uint64_t variable
+#define SEED 0x00221133
 
 enum ADDR_POS : uint8_t{
 	device1,
 	device2
 };
-
-constexpr uint64_t addresses[] PROGMEM = {
-	ADDR_nRF1,
-	ADDR_nRF2
-};
-
-#define ADDRS_SIZE (sizeof(addresses)/sizeof(addresses[0]))
 
 // If you upload the example in other device, change the device
 // to avoid repeat the address
@@ -26,15 +18,15 @@ uint8_t myAddrPos = ADDR_POS::device1;
 uint8_t otherAddrPos = ADDR_POS::device2;
 
 int data = 10;
-RFDO<int> rf(CE_PIN, CSN_PIN, addresses, ADDRS_SIZE, data);
+RFDO<int> rf(CE_PIN, CSN_PIN, SEED, data); // The variable type of 'data' must be the same as RFDO<GS>
 
 void setup(){
 	Serial.begin(115200);
 
 	// if the other device is an a long distance use
-	// rf.init(myAddrPos, RF24_PA_HIGH);
+	// rf.init(myAddrPos, rf24_pa_dbm_e::RF24_PA_HIGH);
 	// or RF24_PA_MAX if it's really far away
-	rf.init(myAddrPos);
+	rf.init(&myAddrPos);
 }
 
 void loop(){
@@ -46,23 +38,33 @@ void loop(){
 
 	if(Serial.available() > 0){
 		char read = Serial.read();
-		if(read == 'S'){
-			Serial.println("Sending...");
-			// Send 'data'
-			if(rf.sendT(otherAddrPos)){
-				Serial.println("Success");
-			}else{
-				Serial.println("Fail");
-			}
-		}else if(read == 'D'){
-			Serial.println("Sending other data...");
-			// Send other data
-			int data2 = 25;
-			if(rf.sendT(data2, otherAddrPos)){
-				Serial.println("Success");
-			}else{
-				Serial.println("Fail");
-			}
+		switch (read){
+			case 'S':
+				Serial.println("Sending...");
+				// Send 'data'
+				if(rf.sendT(otherAddrPos)){
+					Serial.println("Success");
+				}else{
+					Serial.println("Fail");
+				}
+			break;
+
+			case 'D':
+				Serial.println("Sending other data...");
+				// Send other data
+				int data2 = 25;
+				if(rf.sendT(data2, otherAddrPos)){
+					Serial.println("Success");
+				}else{
+					Serial.println("Fail");
+				}
+			break;
+
+			case 'A':
+				std::vector<uint8_t> d;
+				d.push_back(otherAddrPos);
+				data = 11;
+			break;
 		}
 	}
 }
