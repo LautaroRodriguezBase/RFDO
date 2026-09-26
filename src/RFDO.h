@@ -25,7 +25,7 @@
 
 #include <vector>
 
-#define RFDO_VERSION 1001 // v0.1.1
+#define RFDO_VERSION 1002 // v0.1.2
 
 template <typename GS>
 class RFDO: public RF24{
@@ -33,8 +33,8 @@ class RFDO: public RF24{
         /// Initial addr: this will be used to calculate all others addrs.
         const uint64_t& seed;
         /// Object address position
-        uint8_t& myAddrPos;
-        GS* myData;
+        uint8_t* myAddrPos;
+        GS& myData;
         uint8_t typenameTSize;
 
         void stopLisNstartWri(uint8_t devPos);
@@ -52,12 +52,12 @@ class RFDO: public RF24{
 		 * @param myAP the address position needed to recive data
 		 * @param pow the signal power used for nRF24
 		 */
-		void init(uint8_t& myAP, rf24_pa_dbm_e pow = RF24_PA_LOW);
+		void init(uint8_t* myAP, rf24_pa_dbm_e pow = RF24_PA_LOW);
 
         /**
          * Sends the GS to the indicate device.
          */
-        bool sendT(GS& d, uint8_t device);
+        bool sendT(GS* d, uint8_t device);
         bool sendT(uint8_t device);
 
         /**

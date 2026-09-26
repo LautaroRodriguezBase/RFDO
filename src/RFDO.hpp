@@ -7,14 +7,14 @@ RFDO<GS>::RFDO(
 ) :
     RF24(_cepin, _cspin),
     seed(seed),
-    myData(&data),
+    myData(data),
     typenameTSize(sizeof(GS))
 {
 //
 }
 
 template <typename GS>
-void RFDO<GS>::init(uint8_t& myAP, rf24_pa_dbm_e pow){
+void RFDO<GS>::init(uint8_t* myAP, rf24_pa_dbm_e pow){
     // Probar si myAddrPos almacena solo el valor o esta ligado a la direccion
 	this->myAddrPos = myAP;
     this->RF24::begin();
@@ -33,9 +33,9 @@ void RFDO<GS>::stopLisNstartWri(uint8_t devPos){
 }
 
 template <typename GS>
-bool RFDO<GS>::sendT(GS& d, uint8_t mod){
+bool RFDO<GS>::sendT(GS* d, uint8_t mod){
     this->stopLisNstartWri(mod);
-    bool sent = this->RF24::write(&d, this->typenameTSize);
+    bool sent = this->RF24::write(d, this->typenameTSize);
 
     this->startReading();
 
@@ -44,12 +44,12 @@ bool RFDO<GS>::sendT(GS& d, uint8_t mod){
 
 template <typename GS>
 bool RFDO<GS>::sendT(uint8_t mod){
-    return this->sendT(this->myData, mod);
+    return this->sendT(&(this->myData), mod);
 }
 
 template <typename GS>
 GS* RFDO<GS>::getMyData(){
-    return this->myData;
+    return &(this->myData);
 }
 
 template <typename GS>
@@ -64,7 +64,7 @@ void RFDO<GS>::sendTToAll(std::vector<uint8_t>* devices, uint8_t secToTry){
 
         this->RF24::openWritingPipe( this->seed * devices->at(pos) );
 
-        if( this->RF24::write((this->myData), this->typenameTSize) ){
+        if( this->RF24::write(&(this->myData), this->typenameTSize) ){
             devices->erase(devices->begin()+pos);
             pos = (pos < (devices->size() - 1) ? (pos) : 0);
 
@@ -79,6 +79,6 @@ void RFDO<GS>::sendTToAll(std::vector<uint8_t>* devices, uint8_t secToTry){
 template <typename GS>
 void RFDO<GS>::startReading(){
     // Essentially, this is it: openReadingPipe(1, addresses[myAddrPos]);
-    this->RF24::openReadingPipe(1, (this->seed * (this->myAddrPos)));
+    this->RF24::openReadingPipe(1, (this->seed * (*(this->myAddrPos))));
     this->RF24::startListening();
 }
