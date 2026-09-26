@@ -18,6 +18,7 @@ uint8_t myAddrPos = ADDR_POS::device1;
 uint8_t otherAddrPos = ADDR_POS::device2;
 
 int data = 10;
+
 RFDO<int> rf(CE_PIN, CSN_PIN, SEED, data); // The variable type of 'data' must be the same as RFDO<GS>
 
 void setup(){
@@ -37,6 +38,8 @@ void loop(){
 	}
 
 	if(Serial.available() > 0){
+		int data2 = 25;
+
 		char read = Serial.read();
 		switch (read){
 			case 'S':
@@ -52,8 +55,7 @@ void loop(){
 			case 'D':
 				Serial.println("Sending other data...");
 				// Send other data
-				int data2 = 25;
-				if(rf.sendT(data2, otherAddrPos)){
+				if(rf.sendT(&data2, otherAddrPos)){
 					Serial.println("Success");
 				}else{
 					Serial.println("Fail");
@@ -64,6 +66,12 @@ void loop(){
 				std::vector<uint8_t> d;
 				d.push_back(otherAddrPos);
 				data = 11;
+				rf.sendTToAll(&d);
+				if(d.empty()){
+					Serial.println("Success");
+				}else{
+					Serial.println("Fail");
+				}
 			break;
 		}
 	}
