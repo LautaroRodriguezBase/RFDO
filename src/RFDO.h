@@ -25,7 +25,7 @@
 
 #include <vector>
 
-#define RFDO_VERSION 1003 // v0.1.3
+#define RFDO_VERSION 1004 // v0.1.4
 
 template <typename GS>
 class RFDO: public RF24{
