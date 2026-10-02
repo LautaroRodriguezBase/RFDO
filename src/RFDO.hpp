@@ -28,7 +28,8 @@ void RFDO<GS>::init(uint8_t* myAP, rf24_pa_dbm_e pow){
 template <typename GS>
 void RFDO<GS>::stopLisNstartWri(uint8_t devPos){
     this->RF24::stopListening();
-    this->RF24::openWritingPipe( ( (*(this->seed)) * devPos));
+	// It is not the same as ( (*(this->seed)) * (devPos + 1) ) because if devPos is 255, the SEED will be multiplied by 0(zero)
+    this->RF24::openWritingPipe((*(this->seed)) + ( (*(this->seed)) * devPos));
     this->RF24::setRetries((devPos + 3) % 15, 15);
 }
 
@@ -62,7 +63,8 @@ void RFDO<GS>::sendTToAll(std::vector<uint8_t>* devices, uint8_t secToTry){
 
     while( !devices->empty() && ((millis() - startTime) <= (secToTry * 1000)) ){
 
-        this->RF24::openWritingPipe( ( (*(this->seed)) * devices->at(pos)) );
+		// It is not the same as ( (*(this->seed)) * (devices->at(pos) + 1) ) because if devices->at(pos) is 255, the SEED will be multiplied by 0(zero)
+        this->RF24::openWritingPipe( (*(this->seed)) + ( (*(this->seed)) * devices->at(pos)) );
 
         if( this->RF24::write(this->myData, this->typenameTSize) ){
             devices->erase(devices->begin()+pos);
@@ -78,6 +80,7 @@ void RFDO<GS>::sendTToAll(std::vector<uint8_t>* devices, uint8_t secToTry){
 
 template <typename GS>
 void RFDO<GS>::startReading(){
-    this->RF24::openReadingPipe(1, ( (*(this->seed)) * (*(this->myAddrPos))));
+	// It is not the same as ( (*(this->seed)) * ((*(this->myAddrPos)) + 1) ) because if (*(this->myAddrPos)) is 255, the SEED will be multiplied by 0(zero)
+    this->RF24::openReadingPipe(1, (*(this->seed)) + ( (*(this->seed)) * (*(this->myAddrPos))));
     this->RF24::startListening();
 }
