@@ -1,6 +1,14 @@
 #include <RFDO.h>
 
-#ifdef ARDUINO_ESP32C3_DEV
+//#define OTHER_SPI_PIN
+
+#ifdef OTHER_SPI_PIN
+	#define PIN_CE	 22
+	#define PIN_SS 	  5
+	#define SCK_PIN  18
+	#define MISO_PIN 19
+	#define MOSI_PIN 23
+#else
 	#define PIN_CE 3
 	#define PIN_SS 7
 #endif
@@ -40,6 +48,12 @@ RFDO<int> rf(PIN_CE, PIN_SS, &SEED, &data); // The variable type of 'data' must 
 
 void setup(){
 	Serial.begin(115200);
+
+	#ifdef ARDUINO_Node32s
+		SPI.end();
+		//sck miso mosi ss
+		SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN, PIN_SS);
+	#endif
 
 	// if the other device is an a long distance use
 	// rf.init(myAddrPos, rf24_pa_dbm_e::RF24_PA_HIGH);
