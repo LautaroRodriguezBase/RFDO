@@ -25,16 +25,16 @@
 
 #include <vector>
 
-#define RFDO_VERSION 1002 // v0.1.2
+#define RFDO_VERSION 1003 // v0.1.3
 
 template <typename GS>
 class RFDO: public RF24{
     private:
         /// Initial addr: this will be used to calculate all others addrs.
-        const uint64_t& seed;
+        const uint64_t* seed;
         /// Object address position
         uint8_t* myAddrPos;
-        GS& myData;
+        GS* myData;
         uint8_t typenameTSize;
 
         void stopLisNstartWri(uint8_t devPos);
@@ -46,7 +46,7 @@ class RFDO: public RF24{
 		 * @param seed ref to initial data used to calculate all the addresses.
 		 * @param data ref to data to be sent
 		 */
-        RFDO(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, const uint64_t& seed, GS& data);
+        RFDO(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, const uint64_t* seed, GS* data);
 
 		/**
 		 * @param myAP the address position needed to recive data
