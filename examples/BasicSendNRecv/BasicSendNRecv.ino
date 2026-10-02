@@ -1,11 +1,28 @@
 #include <RFDO.h>
 
-// ESP32 C3 pinout
-#define CE_PIN 10
-#define CSN_PIN 7
+#ifdef ARDUINO_ESP32C3_DEV
+	#define PIN_CE 3
+	#define PIN_SS 7
+#endif
 
-// SEED is a uint64_t variable
-#define SEED 0x00221133
+/*
+Octet values to avoid:
+'0xaa' - '0b10101010'
+'0x55' - '0b01010101'
+'0x2a' - '0b00101010'
+'0x15' - '0b00010101'
+
+Nibble values to avoid:
+'0x0a' - '0b00001010'
+'0x05' - '0b00000101'
+'0x02' - '0b00000010'
+'0x01' - '0b00000001'
+
+And all zeros or all ones (0xFFFFFFFFFF) and 0x000FFFFFFF
+
+*/
+// SEED is a uint64_t variable but MAX address size is 5 bytes(40 bit)
+constexpr uint64_t SEED PROGMEM = 0x0000221133;
 
 enum ADDR_POS : uint8_t{
 	device1,
@@ -19,7 +36,7 @@ uint8_t otherAddrPos = ADDR_POS::device2;
 
 int data = 10;
 
-RFDO<int> rf(CE_PIN, CSN_PIN, SEED, data); // The variable type of 'data' must be the same as RFDO<GS>
+RFDO<int> rf(PIN_CE, PIN_SS, &SEED, &data); // The variable type of 'data' must be the same as RFDO<GS>
 
 void setup(){
 	Serial.begin(115200);
@@ -27,6 +44,7 @@ void setup(){
 	// if the other device is an a long distance use
 	// rf.init(myAddrPos, rf24_pa_dbm_e::RF24_PA_HIGH);
 	// or RF24_PA_MAX if it's really far away
+	// default is RF24_PA_LOW
 	rf.init(&myAddrPos);
 }
 
